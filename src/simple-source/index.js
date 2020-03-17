@@ -5,7 +5,11 @@ let workInprogress = null //正在工作的fiber根节点
 let currentRoot = null // 被中断前工作的fiber根节点
 let deletions = [] // 删除dom集合
 
-/** createElement */
+/** createElement
+ * jsx通过babel-loader调用React.createElement()
+ * 生成vdom
+ * @param {} type //0:文本 1: 原生 3: function组件 4:class组件
+*/
 function createElement(type, props, ...children) {
     delete props.__source
     delete props.__self
@@ -251,21 +255,27 @@ function updateFunctionComponent(fiber) {
     const children = [fiber.type(fiber.props)]
     reconcileChildren(fiber, children)
 }
-
+/**
+ * demo: const [count, setCount] = useState(1)
+ *        cb: setCount(count+1)
+ * @param {*} init 
+ */
 function useState(init) {
+    // 从上一个根节点获取hooks
     const oldHook = workInprogress.alternate 
                     && workInprogress.alternate.hooks 
                     && workInprogress.alternate.hooks[hookIndex]
     const hook = {
-        state: oldHook ? oldHook.state : init,
+        state: oldHook ? oldHook.state : init, // 1 -- 1
         queue: []
     }
-    const actions = oldHook ? oldHook.queue : []
+    // 生成新的state, 所以说hooks 每次都会生成新的state
+    const actions = oldHook ? oldHook.queue : [] // [] -- []
     actions.forEach(action => {
-        hook.state = action
+        hook.state = action // 2
     })
     const setState = action => {
-        hook.queue.push(action)
+        hook.queue.push(action) // [count+1]
         workInprogress = {
             dom: currentRoot.dom,
             props: currentRoot.props,
@@ -275,7 +285,7 @@ function useState(init) {
         deletions = []
     }
 
-    workInprogress.hooks.push(hook)
+    workInprogress.hooks.push(hook) // {state:1, queue: []} -- {state:2, queue:[count+1]}
     hookIndex++
     return [hook.state, setState]
 }

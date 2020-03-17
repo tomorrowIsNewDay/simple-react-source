@@ -59,10 +59,28 @@
     let workInprogress = null //正在工作的fiber根节点
     let currentRoot = null // 被中断前工作的fiber根节点
 
+### render 
+    初始化 nextUnitOfWork ／ nextUnitOfWork
+
 ### schedle调度阶段
     requestIdleCallback(workLoop)
     workLoop() 方法
     - 当有空闲时间时，获取下一个nextUnitOfWork
     - 当自上而下遍历完成后，则commitRoot()挂载真实dom到浏览器
 
+### performUnitOfWork
+    - update fibertree 
+        reconcileChildren(fiberroot, fiberRoot.props.children)
+    - 返回下一个fiber 
+### reconcileChildren 调合阶段
+    - diff算法对比
+    - 根据key来匹配上一个fiberRoot上相同的fiber， 更新复用
+    - 生成新的fiber tree，并标记effectTag,以此来做相应的操作
 
+### commit阶段, 挂载真实dom到页面，不能被中断
+    - 遍历workInprogress，根据effectTag来做相应的操作
+    - currentRoot 赋值为 workInprogress
+
+
+### hooks useState
+    - 链表结构， 挂载fiber node 上, 此处用数组模拟，queue: []
