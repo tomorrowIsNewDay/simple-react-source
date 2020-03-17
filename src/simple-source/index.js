@@ -3,7 +3,7 @@
 let nextUnitOfWork = null // 单元任务
 let workInprogress = null //正在工作的fiber根节点
 let currentRoot = null // 被中断前工作的fiber根节点
-let deletions  // 删除dom集合
+let deletions = [] // 删除dom集合
 
 /** createElement */
 function createElement(type, props, ...children) {
@@ -99,6 +99,7 @@ function workLoop(deadline) {
     }
     // 没有下一个单元任务 且生成了新的fiber root, 则挂载
     if(!nextUnitOfWork && workInprogress) {
+        debugger
         commitRoot()
     }
     requestIdleCallback(workLoop)
