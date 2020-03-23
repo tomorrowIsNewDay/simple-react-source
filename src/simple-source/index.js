@@ -123,10 +123,12 @@ function performUnitOfWork(fiber) {
     }
     // 有兄弟节点则返回兄弟节点， 没有则返回父节点
     let nextFiber = fiber
-    while(nextFiber.sibling){
-        return nextFiber.sibling
-    }
-    nextFiber = nextFiber.parent
+    while(nextFiber){
+        if(nextFiber.sibling){
+            return nextFiber.sibling
+        }
+        nextFiber = nextFiber.return
+    }  
 }
 
 /**
@@ -143,10 +145,10 @@ function commitRoot() {
 function commitWork(fiber) {
     if(!fiber) return
 
-    let domParentFiber = fiber.parent
+    let domParentFiber = fiber.return
     while(!domParentFiber.dom) {
         // 找到有dom的fiber
-        domParentFiber = domParentFiber.parent
+        domParentFiber = domParentFiber.return
     }
     const domParent = domParentFiber.dom
     if(fiber.effectTag === 'PLACEMENT' && fiber.dom != null) {
@@ -182,7 +184,7 @@ function reconcileChildren(fiberRoot, elements) {
     let index = 0
     let prevSibling = null
     // 获取上一次的 chidlren
-    let oldFiber = fiberRoot.alternate && fiberRoot.alternate.children
+    let oldFiber = fiberRoot.alternate && fiberRoot.alternate.child
 
     while(index < elements.length || oldFiber != null) {
         const element = elements[index]
@@ -195,7 +197,7 @@ function reconcileChildren(fiberRoot, elements) {
                 type: oldFiber.type,
                 props: element.props,
                 dom: oldFiber.dom,
-                parent: fiberRoot,
+                return: fiberRoot,
                 alternate: oldFiber,
                 effectTag: "UPDATE",
               }
@@ -206,7 +208,7 @@ function reconcileChildren(fiberRoot, elements) {
                 type: element.type,
                 props: element.props,
                 dom: null,
-                parent: fiberRoot,
+                return: fiberRoot,
                 alternate: null,
                 effectTag: 'PLACEMENT'
             }
@@ -236,9 +238,9 @@ function updateHostComponent(fiber) {
         // 不是初始化单元任务
         fiber.dom = createDom(fiber)
     }
-    // if(fiber.parent) {
+    // if(fiber.return) {
     //     // 插入到父节点中
-    //     fiber.parent.dom.appendChild(fiber.dom)
+    //     fiber.return.dom.appendChild(fiber.dom)
     // }
     // 遍历自元素，生产链表结构， fiber tree
     const elements = fiber.props.children
