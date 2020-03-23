@@ -49,7 +49,7 @@
         props: 属性,
         child: 子fiber，
         silibing: 兄弟fiber,
-        parent: 父fiber,
+        return: 父fiber,
         alternate: oldFiberRoot,
         effectTag: "UPDATE",
     }
