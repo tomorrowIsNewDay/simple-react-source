@@ -81,6 +81,5 @@
     - 遍历workInprogress，根据effectTag来做相应的操作
     - currentRoot 赋值为 workInprogress
 
-
 ### hooks useState
     - 链表结构， 挂载fiber node 上, 此处用数组模拟，queue: []
