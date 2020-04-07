@@ -67,6 +67,8 @@
     workLoop() 方法
     - 当有空闲时间时，获取下一个nextUnitOfWork
     - 当自上而下遍历完成后，则commitRoot()挂载真实dom到浏览器
+    
+### render / reconcile, 任务可以被中断，恢复
 
 ### performUnitOfWork
     - update fibertree 
